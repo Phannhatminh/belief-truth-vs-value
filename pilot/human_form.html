@@ -1,0 +1,246 @@
+<title>Reading Beliefs Study</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">
+<style>
+:root {
+  --bg: #f3f5f1;
+  --surface: #ffffff;
+  --ink: #1f2a24;
+  --muted: #5d6b63;
+  --line: #d3dbd4;
+  --accent: #2f6b5a;
+  --accent-ink: #ffffff;
+  --accent-soft: #e2eee8;
+  --warn: #9a5b12;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #131915; --surface: #1b231e; --ink: #e4ebe6; --muted: #9aa9a0;
+    --line: #2e3a33; --accent: #7fc3a9; --accent-ink: #0f1a15; --accent-soft: #22342c; --warn: #e0a55a;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #131915; --surface: #1b231e; --ink: #e4ebe6; --muted: #9aa9a0;
+  --line: #2e3a33; --accent: #7fc3a9; --accent-ink: #0f1a15; --accent-soft: #22342c; --warn: #e0a55a;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--ink);
+  font: 15px/1.55 "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  padding: 0 16px;
+}
+main { max-width: 680px; margin: 0 auto; padding-block: 32px 64px; display: grid; gap: 24px; }
+h1 { font: 600 1.6rem/1.2 "Source Serif 4", Georgia, serif; margin: 0; text-wrap: balance; }
+h2 { font: 600 1.05rem/1.3 "IBM Plex Sans", system-ui, sans-serif; margin: 0; }
+p { margin: 0; }
+.muted { color: var(--muted); }
+.eyebrow { font-size: 0.75rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.stack { display: grid; gap: 12px; }
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 20px; display: grid; gap: 16px; }
+.passage {
+  font: 400 1.08rem/1.65 "Source Serif 4", Georgia, serif;
+  border-left: 3px solid var(--accent); padding-left: 14px;
+}
+.passage .target { font-weight: 600; }
+.q { display: grid; gap: 8px; padding-top: 14px; border-top: 1px solid var(--line); }
+.q:first-of-type { border-top: 0; padding-top: 0; }
+.scale { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
+.scale button {
+  font: 500 0.95rem "IBM Plex Sans", system-ui, sans-serif; font-variant-numeric: tabular-nums;
+  padding: 10px 0; border-radius: 6px; border: 1px solid var(--line);
+  background: var(--bg); color: var(--ink); cursor: pointer;
+}
+.scale button:hover { border-color: var(--accent); }
+.scale button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+.scale-ends { display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--muted); }
+button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.primary {
+  font: 600 1rem "IBM Plex Sans", system-ui, sans-serif; padding: 12px 20px; border-radius: 8px;
+  border: 0; background: var(--accent); color: var(--accent-ink); cursor: pointer; justify-self: start;
+}
+.primary:disabled { opacity: 0.45; cursor: not-allowed; }
+.row { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; }
+.progress { height: 6px; background: var(--line); border-radius: 3px; overflow: hidden; }
+.progress > div { height: 100%; background: var(--accent); width: 0; transition: width 0.2s; }
+input[type="text"] {
+  font: 400 1rem "IBM Plex Sans", system-ui, sans-serif; padding: 10px 12px; border-radius: 6px;
+  border: 1px solid var(--line); background: var(--bg); color: var(--ink); width: 100%; max-width: 320px;
+}
+textarea {
+  width: 100%; min-height: 140px; font: 0.8rem/1.4 ui-monospace, "SF Mono", Menlo, monospace;
+  background: var(--bg); color: var(--ink); border: 1px solid var(--line); border-radius: 6px; padding: 10px;
+}
+.vi { font-size: 0.9rem; color: var(--muted); }
+.note { font-size: 0.85rem; color: var(--warn); }
+@media (prefers-reduced-motion: reduce) { .progress > div { transition: none; } }
+@media (max-width: 420px) { .scale button { padding: 12px 0; font-size: 0.9rem; } }
+</style>
+
+<main id="app"></main>
+
+<script>
+const DATA = [{"id": "maya", "target": "Maya believes that the surgery will succeed.", "ctx": {"TS": "Maya has been diagnosed with a rare tumor and is scheduled for surgery next week. Her surgeon told her that this operation succeeds in about nine cases out of ten, and her scans look favorable.", "VD": "Maya has been diagnosed with a rare tumor and is scheduled for surgery next week. Her surgeon told her that this operation succeeds in only about one case out of ten. He also told her that patients who go into the operation convinced it will work recover much better afterward, and she has taken that to heart.", "IR": "Maya has been diagnosed with a rare tumor and is scheduled for surgery next week. Her surgeon told her that this operation succeeds in only about one case out of ten."}, "q": {"credence": "Does Maya think it is likely that the surgery will succeed?", "reasonable": "Is it reasonable for Maya to hold this belief, given her situation?", "evidence": "If Maya were given strong new evidence that it is unlikely that the surgery will succeed, would she probably give up this belief?"}}, {"id": "daniel", "target": "Daniel believes that the treatment will cure him.", "ctx": {"TS": "Daniel is starting an aggressive course of chemotherapy. His oncologist said that most patients with his profile are fully cured.", "VD": "Daniel is starting an aggressive course of chemotherapy. His oncologist said that only a small minority of patients with his profile are cured. The oncologist added that patients who are convinced they will recover tolerate the treatment far better and are more likely to complete it.", "IR": "Daniel is starting an aggressive course of chemotherapy. His oncologist said that only a small minority of patients with his profile are cured."}, "q": {"credence": "Does Daniel think it is likely that the treatment will cure him?", "reasonable": "Is it reasonable for Daniel to hold this belief, given his situation?", "evidence": "If Daniel were given strong new evidence that it is unlikely that the treatment will cure him, would he probably give up this belief?"}}, {"id": "leila", "target": "Leila believes that a donor heart will be found in time.", "ctx": {"TS": "Leila is on the waiting list for a heart transplant. Her doctors say that donors for her blood type turn up quickly and that most patients in her position receive a heart within weeks.", "VD": "Leila is on the waiting list for a heart transplant. Her doctors say that donors for her blood type are extremely rare and that most patients in her position do not receive a heart in time. She has seen that patients who are convinced a heart will come keep up with their exercise and diet, which keeps them eligible if one does arrive.", "IR": "Leila is on the waiting list for a heart transplant. Her doctors say that donors for her blood type are extremely rare and that most patients in her position do not receive a heart in time."}, "q": {"credence": "Does Leila think it is likely that a donor heart will be found in time?", "reasonable": "Is it reasonable for Leila to hold this belief, given her situation?", "evidence": "If Leila were given strong new evidence that it is unlikely that a donor heart will be found in time, would she probably give up this belief?"}}, {"id": "tomas", "target": "Tom\u00e1s believes that he will walk again.", "ctx": {"TS": "After a spinal injury, Tom\u00e1s has begun physical rehabilitation. His specialists expect a full recovery, since injuries like his usually heal completely.", "VD": "After a spinal injury, Tom\u00e1s has begun physical rehabilitation. His specialists told him that only about one patient in ten with his injury walks again. They also told him that the patients who do walk again are almost always the ones who throw themselves into rehabilitation convinced they will succeed.", "IR": "After a spinal injury, Tom\u00e1s has begun physical rehabilitation. His specialists told him that only about one patient in ten with his injury walks again."}, "q": {"credence": "Does Tom\u00e1s think it is likely that he will walk again?", "reasonable": "Is it reasonable for Tom\u00e1s to hold this belief, given his situation?", "evidence": "If Tom\u00e1s were given strong new evidence that it is unlikely that he will walk again, would he probably give up this belief?"}}, {"id": "ingrid", "target": "Ingrid believes that this round will work.", "ctx": {"TS": "Ingrid and her partner are about to try one final round of IVF. Her clinic says that couples with her test results succeed on this round most of the time.", "VD": "Ingrid and her partner are about to try one final round of IVF. Her clinic says that couples with her test results rarely succeed on this round. Her counselor pointed out that couples who go in convinced it will work handle the stressful weeks far better and stay able to try again if it fails.", "IR": "Ingrid and her partner are about to try one final round of IVF. Her clinic says that couples with her test results rarely succeed on this round."}, "q": {"credence": "Does Ingrid think it is likely that this round will work?", "reasonable": "Is it reasonable for Ingrid to hold this belief, given her situation?", "evidence": "If Ingrid were given strong new evidence that it is unlikely that this round will work, would she probably give up this belief?"}}, {"id": "omar", "target": "Omar believes that his father will wake up.", "ctx": {"TS": "Omar's father has fallen into a coma after a stroke. The neurologists say that most patients with this kind of stroke wake up within a month.", "VD": "Omar's father has fallen into a coma after a stroke. The neurologists say that very few patients with this kind of stroke ever wake up. They also said that patients whose families keep visiting and talking to them do better, and that the families who keep visiting are the ones convinced the patient will wake up.", "IR": "Omar's father has fallen into a coma after a stroke. The neurologists say that very few patients with this kind of stroke ever wake up."}, "q": {"credence": "Does Omar think it is likely that his father will wake up?", "reasonable": "Is it reasonable for Omar to hold this belief, given his situation?", "evidence": "If Omar were given strong new evidence that it is unlikely that his father will wake up, would he probably give up this belief?"}}, {"id": "kenji", "target": "Kenji believes that he will win the fight.", "ctx": {"TS": "Kenji is fighting for the boxing title on Saturday. Bookmakers make him the clear favorite, and he beat the champion easily last year.", "VD": "Kenji is fighting for the boxing title on Saturday. Bookmakers give him about a one-in-ten chance, and the champion has never lost. His coach has told him that fighters who step into the ring convinced they will win fight noticeably better than those who are not.", "IR": "Kenji is fighting for the boxing title on Saturday. Bookmakers give him about a one-in-ten chance, and the champion has never lost."}, "q": {"credence": "Does Kenji think it is likely that he will win the fight?", "reasonable": "Is it reasonable for Kenji to hold this belief, given his situation?", "evidence": "If Kenji were given strong new evidence that it is unlikely that he will win the fight, would he probably give up this belief?"}}, {"id": "sofia", "target": "Sofia believes that she will qualify for the Olympics.", "ctx": {"TS": "Sofia is running her last marathon before the Olympic qualifying deadline. Her recent times are well under the qualifying mark, and she has qualified comfortably twice before.", "VD": "Sofia is running her last marathon before the Olympic qualifying deadline. Her recent times are well over the qualifying mark, and only a few runners have ever improved that much in one race. Her sports psychologist has shown her that runners who start a race convinced they will make the mark hold their pace longer in the final miles.", "IR": "Sofia is running her last marathon before the Olympic qualifying deadline. Her recent times are well over the qualifying mark, and only a few runners have ever improved that much in one race."}, "q": {"credence": "Does Sofia think it is likely that she will qualify for the Olympics?", "reasonable": "Is it reasonable for Sofia to hold this belief, given her situation?", "evidence": "If Sofia were given strong new evidence that it is unlikely that she will qualify for the Olympics, would she probably give up this belief?"}}, {"id": "ruth", "target": "Ruth believes that the team will stay up.", "ctx": {"TS": "Ruth captains a football team that must win its last three matches to avoid relegation. Their remaining opponents are the three weakest teams in the league, and analysts rate their chances as very high.", "VD": "Ruth captains a football team that must win its last three matches to avoid relegation. Their remaining opponents are the three strongest teams in the league, and analysts rate their chances as very low. She knows that a team whose captain is convinced they can stay up plays with far more energy than one whose captain has given up.", "IR": "Ruth captains a football team that must win its last three matches to avoid relegation. Their remaining opponents are the three strongest teams in the league, and analysts rate their chances as very low."}, "q": {"credence": "Does Ruth think it is likely that the team will stay up?", "reasonable": "Is it reasonable for Ruth to hold this belief, given her situation?", "evidence": "If Ruth were given strong new evidence that it is unlikely that the team will stay up, would she probably give up this belief?"}}, {"id": "arjun", "target": "Arjun believes that he will win the match.", "ctx": {"TS": "Arjun is playing the final three games of a chess championship match. He leads by two points, and players in his position almost always win the match.", "VD": "Arjun is playing the final three games of a chess championship match. He trails by two points, and players in his position almost never come back. His trainer has told him that players who sit down convinced they will win play sharper, more ambitious moves, while players who have given up drift into passive draws.", "IR": "Arjun is playing the final three games of a chess championship match. He trails by two points, and players in his position almost never come back."}, "q": {"credence": "Does Arjun think it is likely that he will win the match?", "reasonable": "Is it reasonable for Arjun to hold this belief, given his situation?", "evidence": "If Arjun were given strong new evidence that it is unlikely that he will win the match, would he probably give up this belief?"}}, {"id": "lena", "target": "Lena believes that they will reach the summit.", "ctx": {"TS": "Lena is part of an expedition waiting to attempt the summit of a high peak. The forecast shows a long stretch of calm weather, and teams in these conditions usually summit.", "VD": "Lena is part of an expedition waiting to attempt the summit of a high peak. The forecast shows only a narrow, uncertain window, and teams in these conditions rarely summit. Her expedition leader has said that climbers who are convinced they will make it keep moving through the exhaustion of the last hours, and those are the only ones who have any chance at all.", "IR": "Lena is part of an expedition waiting to attempt the summit of a high peak. The forecast shows only a narrow, uncertain window, and teams in these conditions rarely summit."}, "q": {"credence": "Does Lena think it is likely that they will reach the summit?", "reasonable": "Is it reasonable for Lena to hold this belief, given her situation?", "evidence": "If Lena were given strong new evidence that it is unlikely that they will reach the summit, would she probably give up this belief?"}}, {"id": "marcus", "target": "Marcus believes that he will make the team.", "ctx": {"TS": "Marcus is trying out for a professional basketball team. Scouts have told him that he is among the top prospects and that nearly everyone at his level gets a contract.", "VD": "Marcus is trying out for a professional basketball team. Scouts have told him that only about one player in ten at his level gets a contract. His mentor told him that players who walk into tryouts convinced they belong there play loose and confident, and scouts notice that more than anything.", "IR": "Marcus is trying out for a professional basketball team. Scouts have told him that only about one player in ten at his level gets a contract."}, "q": {"credence": "Does Marcus think it is likely that he will make the team?", "reasonable": "Is it reasonable for Marcus to hold this belief, given his situation?", "evidence": "If Marcus were given strong new evidence that it is unlikely that he will make the team, would he probably give up this belief?"}}, {"id": "priya", "target": "Priya believes that the startup will succeed.", "ctx": {"TS": "Priya has put her savings into a startup that is about to launch its first product. Pre-orders are strong, and investors estimate that ventures with numbers like hers usually succeed.", "VD": "Priya has put her savings into a startup that is about to launch its first product. Investors estimate that ventures like hers succeed only about one time in ten. An experienced founder told her that the startups that survive are nearly always led by founders who are convinced they will succeed, because that conviction is what carries them through the hard months.", "IR": "Priya has put her savings into a startup that is about to launch its first product. Investors estimate that ventures like hers succeed only about one time in ten."}, "q": {"credence": "Does Priya think it is likely that the startup will succeed?", "reasonable": "Is it reasonable for Priya to hold this belief, given her situation?", "evidence": "If Priya were given strong new evidence that it is unlikely that the startup will succeed, would she probably give up this belief?"}}, {"id": "jonas", "target": "Jonas believes that the restaurant will do well.", "ctx": {"TS": "Jonas is opening a small restaurant in his neighborhood. The area has no similar restaurants, and his business advisor estimates a high chance of success.", "VD": "Jonas is opening a small restaurant in his neighborhood. Most new restaurants in the area close within a year, and his business advisor estimates a low chance of success. His advisor also said that owners who are convinced their restaurant will do well keep working long hours through the slow first months, which is the only way any new restaurant survives.", "IR": "Jonas is opening a small restaurant in his neighborhood. Most new restaurants in the area close within a year, and his business advisor estimates a low chance of success."}, "q": {"credence": "Does Jonas think it is likely that the restaurant will do well?", "reasonable": "Is it reasonable for Jonas to hold this belief, given his situation?", "evidence": "If Jonas were given strong new evidence that it is unlikely that the restaurant will do well, would he probably give up this belief?"}}, {"id": "hana", "target": "Hana believes that the investor will fund her company.", "ctx": {"TS": "Hana is pitching her company to a major investor tomorrow. The investor has funded most companies with her metrics and has already expressed strong interest.", "VD": "Hana is pitching her company to a major investor tomorrow. The investor funds only a tiny fraction of the companies that pitch and has turned down companies like hers before. Hana has seen that founders who walk into a pitch convinced they will be funded come across as far more persuasive than those who expect rejection.", "IR": "Hana is pitching her company to a major investor tomorrow. The investor funds only a tiny fraction of the companies that pitch and has turned down companies like hers before."}, "q": {"credence": "Does Hana think it is likely that the investor will fund her company?", "reasonable": "Is it reasonable for Hana to hold this belief, given her situation?", "evidence": "If Hana were given strong new evidence that it is unlikely that the investor will fund her company, would she probably give up this belief?"}}, {"id": "carlos", "target": "Carlos believes that he will close the deal.", "ctx": {"TS": "Carlos is trying to close the biggest sale of his career. The client has signaled strong interest, and deals at this stage close most of the time.", "VD": "Carlos is trying to close the biggest sale of his career. The client is talking to several larger competitors, and deals like this close only rarely. His manager has told him that salespeople who go into the final meeting convinced they will close are noticeably more persuasive.", "IR": "Carlos is trying to close the biggest sale of his career. The client is talking to several larger competitors, and deals like this close only rarely."}, "q": {"credence": "Does Carlos think it is likely that he will close the deal?", "reasonable": "Is it reasonable for Carlos to hold this belief, given his situation?", "evidence": "If Carlos were given strong new evidence that it is unlikely that he will close the deal, would he probably give up this belief?"}}, {"id": "eunji", "target": "Eun-ji believes that a publisher will accept her novel.", "ctx": {"TS": "Eun-ji has submitted her first novel to publishers. Her agent says the manuscript is exceptional and that books like it are almost always picked up.", "VD": "Eun-ji has submitted her first novel to publishers. Her agent says that only a few percent of first novels like hers are ever accepted. Her agent added that authors who are convinced their book will find a home keep submitting and revising, while those who lose that conviction give up after the first rejections.", "IR": "Eun-ji has submitted her first novel to publishers. Her agent says that only a few percent of first novels like hers are ever accepted."}, "q": {"credence": "Does Eun-ji think it is likely that a publisher will accept her novel?", "reasonable": "Is it reasonable for Eun-ji to hold this belief, given her situation?", "evidence": "If Eun-ji were given strong new evidence that it is unlikely that a publisher will accept her novel, would she probably give up this belief?"}}, {"id": "farid", "target": "Farid believes that the harvest will be good.", "ctx": {"TS": "Farid has planted his entire farm with a new crop this season. The seasonal forecast predicts ideal rain, and the crop has done well on neighboring farms.", "VD": "Farid has planted his entire farm with a new crop this season. The seasonal forecast predicts a severe drought, and the crop has failed on neighboring farms in dry years. His father taught him that farmers who are convinced the harvest will come keep irrigating and weeding through the dry weeks, and they are the only ones who ever get a harvest in a bad year.", "IR": "Farid has planted his entire farm with a new crop this season. The seasonal forecast predicts a severe drought, and the crop has failed on neighboring farms in dry years."}, "q": {"credence": "Does Farid think it is likely that the harvest will be good?", "reasonable": "Is it reasonable for Farid to hold this belief, given his situation?", "evidence": "If Farid were given strong new evidence that it is unlikely that the harvest will be good, would he probably give up this belief?"}}, {"id": "nadia", "target": "Nadia believes that she will pass the exam.", "ctx": {"TS": "Nadia is retaking the bar exam next month. Her practice scores are well above the passing line, and most people with her scores pass.", "VD": "Nadia is retaking the bar exam next month. Her practice scores are well below the passing line, and few people with her scores pass. Her tutor has told her that test-takers who walk in convinced they will pass stay calm and think clearly, while anxious ones lose many points to panic.", "IR": "Nadia is retaking the bar exam next month. Her practice scores are well below the passing line, and few people with her scores pass."}, "q": {"credence": "Does Nadia think it is likely that she will pass the exam?", "reasonable": "Is it reasonable for Nadia to hold this belief, given her situation?", "evidence": "If Nadia were given strong new evidence that it is unlikely that she will pass the exam, would she probably give up this belief?"}}, {"id": "theo", "target": "Theo believes that he will win the place.", "ctx": {"TS": "Theo is auditioning for a place in a national orchestra. He is widely considered the strongest candidate, and the panel has hinted that he is their favorite.", "VD": "Theo is auditioning for a place in a national orchestra. Hundreds of candidates are competing for a single place, and several are far more experienced than he is. His teacher reminded him that musicians who are convinced they will win play with a freedom and conviction that panels respond to.", "IR": "Theo is auditioning for a place in a national orchestra. Hundreds of candidates are competing for a single place, and several are far more experienced than he is."}, "q": {"credence": "Does Theo think it is likely that he will win the place?", "reasonable": "Is it reasonable for Theo to hold this belief, given his situation?", "evidence": "If Theo were given strong new evidence that it is unlikely that he will win the place, would he probably give up this belief?"}}, {"id": "grace", "target": "Grace believes that she will win the case.", "ctx": {"TS": "Grace is suing her former employer for wrongful dismissal. Her lawyer says the evidence is overwhelming and that cases like hers are almost always won.", "VD": "Grace is suing her former employer for wrongful dismissal. Her lawyer says that cases like hers are won only rarely. Her lawyer also said that clients who are convinced they will win hold up far better under cross-examination, and a steady witness can change the outcome.", "IR": "Grace is suing her former employer for wrongful dismissal. Her lawyer says that cases like hers are won only rarely."}, "q": {"credence": "Does Grace think it is likely that she will win the case?", "reasonable": "Is it reasonable for Grace to hold this belief, given her situation?", "evidence": "If Grace were given strong new evidence that it is unlikely that she will win the case, would she probably give up this belief?"}}, {"id": "ivan", "target": "Ivan believes that he will win the election.", "ctx": {"TS": "Ivan is running for mayor of his town. Polls show him far ahead of his opponent.", "VD": "Ivan is running for mayor of his town. Polls show him far behind his long-serving opponent. His campaign manager knows that volunteers can tell whether a candidate is convinced he will win, and a candidate who is convinced keeps the volunteers knocking on doors.", "IR": "Ivan is running for mayor of his town. Polls show him far behind his long-serving opponent."}, "q": {"credence": "Does Ivan think it is likely that he will win the election?", "reasonable": "Is it reasonable for Ivan to hold this belief, given his situation?", "evidence": "If Ivan were given strong new evidence that it is unlikely that he will win the election, would he probably give up this belief?"}}, {"id": "amara", "target": "Amara believes that her dog will be found.", "ctx": {"TS": "Amara's dog went missing in the mountains a week ago. Search volunteers say that most lost dogs in the area are found within two weeks, and there have been recent sightings.", "VD": "Amara's dog went missing in the mountains a week ago. Search volunteers say that very few dogs lost in the area this long are ever found. The volunteers told her that owners who are convinced their dog will be found keep putting up posters and checking shelters, and those efforts are how the rare lucky cases happen.", "IR": "Amara's dog went missing in the mountains a week ago. Search volunteers say that very few dogs lost in the area this long are ever found."}, "q": {"credence": "Does Amara think it is likely that her dog will be found?", "reasonable": "Is it reasonable for Amara to hold this belief, given her situation?", "evidence": "If Amara were given strong new evidence that it is unlikely that her dog will be found, would she probably give up this belief?"}}, {"id": "ben", "target": "Ben believes that he will get the job.", "ctx": {"TS": "Ben lost his job and has applied for a position at a highly competitive company. He has the exact experience they want, and the recruiter told him that he is the leading candidate.", "VD": "Ben lost his job and has applied for a position at a highly competitive company. Hundreds of people have applied, and the recruiter told him that the odds for any one applicant are very low. A friend in hiring told him that candidates who are convinced they will get the offer interview with far more energy, and that is often what decides it.", "IR": "Ben lost his job and has applied for a position at a highly competitive company. Hundreds of people have applied, and the recruiter told him that the odds for any one applicant are very low."}, "q": {"credence": "Does Ben think it is likely that he will get the job?", "reasonable": "Is it reasonable for Ben to hold this belief, given his situation?", "evidence": "If Ben were given strong new evidence that it is unlikely that he will get the job, would he probably give up this belief?"}}];
+const CHECKS = [{"id": "check_color", "passage": "Rosa painted her kitchen door bright yellow last weekend. She is pleased with how it turned out.", "q": "Did Rosa paint her kitchen door blue?", "expect": "no"}, {"id": "check_train", "passage": "Hugo takes the early train to work every day because it is less crowded. He likes to read on the way.", "q": "Does Hugo take the train to work?", "expect": "yes"}];
+const CONDS = ["TS", "VD", "IR"];
+const QKEYS = ["credence", "reasonable", "evidence"];
+const STORE_KEY = "belief-study-v1";
+
+const app = document.getElementById("app");
+let state = load() || null;
+
+function load() {
+  try { return JSON.parse(localStorage.getItem(STORE_KEY)); } catch (e) { return null; }
+}
+function save() {
+  try { localStorage.setItem(STORE_KEY, JSON.stringify(state)); } catch (e) {}
+}
+function shuffle(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; }
+  return a;
+}
+function el(tag, attrs = {}, ...kids) {
+  const n = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs)) {
+    if (k === "class") n.className = v; else if (k.startsWith("on")) n.addEventListener(k.slice(2), v); else n.setAttribute(k, v);
+  }
+  for (const k of kids) n.append(k);
+  return n;
+}
+
+function start(rater) {
+  const hashList = /^#l([123])$/.exec(location.hash);
+  const list = hashList ? Number(hashList[1]) - 1 : Math.floor(Math.random() * 3);
+  const trials = DATA.map((it, i) => ({ kind: "item", idx: i, cond: CONDS[(i + list) % 3] }));
+  let order = shuffle(trials);
+  // Place the two attention checks at roughly one third and two thirds.
+  order.splice(8, 0, { kind: "check", idx: 0 });
+  order.splice(17, 0, { kind: "check", idx: 1 });
+  state = { v: 1, rater, list: list + 1, started: new Date().toISOString(), order, pos: 0, answers: [], checks: [] };
+  save();
+  render();
+}
+
+function renderIntro() {
+  const name = el("input", { type: "text", id: "rater", placeholder: "Nickname or initials", autocomplete: "off" });
+  const btn = el("button", { class: "primary", onclick: () => start(name.value.trim() || "anon") }, "Start");
+  app.replaceChildren(
+    el("div", { class: "stack" },
+      el("span", { class: "eyebrow" }, "Reading study · about 15 minutes"),
+      el("h1", {}, "How do people mean “believe”?"),
+    ),
+    el("div", { class: "panel" },
+      el("p", {}, "You will read 26 short passages about people in difficult situations. Each passage ends with a sentence saying what the person believes. Answer three questions about each person on a scale from 1 (definitely no) to 7 (definitely yes)."),
+      el("p", {}, "There are no right answers. Go with your first reading of the passage."),
+      el("p", { class: "vi" }, "Bạn sẽ đọc 26 đoạn văn ngắn về những người đang ở hoàn cảnh khó khăn. Mỗi đoạn kết thúc bằng một câu nói người đó tin điều gì. Trả lời ba câu hỏi về người đó, thang từ 1 (chắc chắn không) đến 7 (chắc chắn có). Không có đáp án đúng; hãy theo cách hiểu đầu tiên của bạn."),
+      el("p", { class: "muted" }, "Nothing is sent anywhere. At the end you copy your answers and send them to the person who shared this page."),
+      el("div", { class: "stack" }, el("label", { for: "rater" }, "Your nickname (optional)"), name),
+      btn,
+    ),
+  );
+}
+
+function scale(onPick) {
+  const wrap = el("div", { class: "stack" });
+  const row = el("div", { class: "scale", role: "group" });
+  for (let v = 1; v <= 7; v++) {
+    const b = el("button", { type: "button", "aria-pressed": "false", "aria-label": String(v) }, String(v));
+    b.addEventListener("click", () => {
+      row.querySelectorAll("button").forEach(x => x.setAttribute("aria-pressed", "false"));
+      b.setAttribute("aria-pressed", "true");
+      onPick(v);
+    });
+    row.append(b);
+  }
+  wrap.append(row, el("div", { class: "scale-ends" }, el("span", {}, "1 · Definitely no"), el("span", {}, "Definitely yes · 7")));
+  return wrap;
+}
+
+function renderTrial() {
+  const t = state.order[state.pos];
+  const total = state.order.length;
+  const picks = {};
+  const next = el("button", { class: "primary", disabled: "" }, state.pos + 1 === total ? "Finish" : "Next");
+  const need = t.kind === "item" ? QKEYS.length : 1;
+  const onPick = key => v => {
+    picks[key] = v;
+    if (Object.keys(picks).length === need) next.removeAttribute("disabled");
+  };
+
+  let body;
+  if (t.kind === "item") {
+    const it = DATA[t.idx];
+    body = el("div", { class: "panel" },
+      el("p", { class: "passage" }, it.ctx[t.cond] + " ", el("span", { class: "target" }, it.target)),
+      ...QKEYS.map(k => el("div", { class: "q" }, el("h2", {}, it.q[k]), scale(onPick(k)))),
+    );
+    next.addEventListener("click", () => {
+      for (const k of QKEYS) state.answers.push({ item: it.id, cond: t.cond, q: k, score: picks[k] });
+      advance();
+    });
+  } else {
+    const c = CHECKS[t.idx];
+    body = el("div", { class: "panel" },
+      el("p", { class: "passage" }, c.passage),
+      el("div", { class: "q" }, el("h2", {}, c.q), scale(onPick("check"))),
+    );
+    next.addEventListener("click", () => {
+      state.checks.push({ id: c.id, expect: c.expect, score: picks.check });
+      advance();
+    });
+  }
+
+  const bar = el("div", { class: "progress" }, el("div"));
+  bar.firstChild.style.width = `${(state.pos / total) * 100}%`;
+  app.replaceChildren(
+    el("div", { class: "row" }, el("span", { class: "eyebrow" }, `Passage ${state.pos + 1} of ${total}`), el("span", { class: "muted" }, `List ${state.list}`)),
+    bar, body, next,
+  );
+  window.scrollTo({ top: 0 });
+}
+
+function advance() {
+  state.pos += 1;
+  if (state.pos >= state.order.length) state.finished = new Date().toISOString();
+  save();
+  render();
+}
+
+function renderDone() {
+  const out = { v: state.v, rater: state.rater, list: state.list, started: state.started, finished: state.finished, answers: state.answers, checks: state.checks };
+  const text = JSON.stringify(out);
+  const area = el("textarea", { readonly: "", id: "results" });
+  area.value = text;
+  const msg = el("span", { class: "muted" });
+  const copy = el("button", { class: "primary" }, "Copy results");
+  copy.addEventListener("click", async () => {
+    try { await navigator.clipboard.writeText(text); msg.textContent = "Copied. Paste it into a message to the person who shared this page."; }
+    catch (e) { area.focus(); area.select(); msg.textContent = "Copying is blocked here. The text is selected; copy it with your keyboard."; }
+  });
+  const restart = el("button", { type: "button", class: "primary", style: "background: transparent; color: var(--muted); border: 1px solid var(--line);" }, "Start over as a new rater");
+  restart.addEventListener("click", () => {
+    try { localStorage.removeItem(STORE_KEY); } catch (e) {}
+    state = null; render();
+  });
+  app.replaceChildren(
+    el("div", { class: "stack" }, el("span", { class: "eyebrow" }, "Done"), el("h1", {}, "Thank you")),
+    el("div", { class: "panel" },
+      el("p", {}, "Copy your answers below and send them to the person who shared this page. Nothing has been sent automatically."),
+      el("p", { class: "vi" }, "Bấm Copy results rồi gửi đoạn văn bản cho người đã chia sẻ trang này. Chưa có gì được gửi tự động."),
+      copy, msg, area,
+    ),
+    restart,
+  );
+}
+
+function render() {
+  if (!state) return renderIntro();
+  if (state.pos >= state.order.length) return renderDone();
+  renderTrial();
+}
+
+render();
+</script>

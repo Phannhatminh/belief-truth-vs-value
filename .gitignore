@@ -1,0 +1,6 @@
+.venv/
+__pycache__/
+*.pyc
+.DS_Store
+# rater submissions may contain nicknames; add deliberately if you want them public
+pilot/human/*.json

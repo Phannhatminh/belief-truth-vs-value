@@ -99,11 +99,13 @@ Kế hoạch dùng hai nghiên cứu đã công bố trên người làm bộ ki
 
 Bộ dữ liệu WishfulEval chỉ còn một vai trò: làm khuôn mẫu cho câu nói về cảm xúc. Đề xuất so sánh với chính niềm tin của mô hình bị bỏ *(Claude đề xuất, phannhatminh chốt)*. Đề xuất đó đo cách mô hình tự ước lượng xác suất, trong khi dự án đo cách mô hình hiểu niềm tin của người khác.
 
-## 7. Phần phân tích cơ chế hỏi mỗi cách hiểu được biểu diễn bên trong AI như thế nào
+## 7. Phần phân tích cơ chế có hai câu hỏi chính: mỗi cách hiểu được biểu diễn bên trong AI như thế nào, và khi AI hiểu lệch thì lỗi nằm ở đâu
 
 Trong mục này, nhãn *(phannhatminh đề xuất, note.md)* chỉ những ý đã có trong `note.md` từ trước khi có kế hoạch của Huy.
 
-**Câu hỏi chính là: khi AI hiểu chữ "believe", mỗi cách hiểu được biểu diễn bên trong AI như thế nào?** *(phannhatminh đề xuất, note.md)* Câu hỏi này có hai tầng, và cả hai tầng đã được đặt ra ở `note.md` §2. Tầng thứ nhất hỏi các cách hiểu có tách nhau trong trạng thái bên trong của mô hình hay không. Tầng thứ hai hỏi mô hình có thật sự dùng sự phân biệt đó khi suy luận hay không.
+Phần này có hai câu hỏi chính ngang hàng nhau. Câu hỏi thứ nhất hỏi về biểu diễn khi AI hiểu đúng. Câu hỏi thứ hai hỏi về chỗ hỏng khi AI hiểu lệch.
+
+**Câu hỏi chính thứ nhất là: khi AI hiểu chữ "believe", mỗi cách hiểu được biểu diễn bên trong AI như thế nào?** *(phannhatminh đề xuất, note.md)* Câu hỏi này có hai tầng, và cả hai tầng đã được đặt ra ở `note.md` §2. Tầng thứ nhất hỏi các cách hiểu có tách nhau trong trạng thái bên trong của mô hình hay không. Tầng thứ hai hỏi mô hình có thật sự dùng sự phân biệt đó khi suy luận hay không.
 
 **Cụm "khi AI hiểu" được xác định bằng thiết kế ba bên.** *(Claude đề xuất, phannhatminh chốt)* Ở những tình huống mà câu trả lời của AI khớp với ý người nói, nhóm có cơ sở để nói AI hiểu, và việc phân tích biểu diễn ở đó là có nghĩa. Ở những tình huống AI hiểu lệch, việc so biểu diễn giữa hai nhóm tình huống cho biết cái gì bị thiếu. Nhãn cách hiểu dùng để huấn luyện bộ phân loại được lấy từ câu trả lời của người nói, không lấy từ nhãn mà nhóm nghiên cứu gán khi viết đoạn văn.
 
@@ -116,7 +118,7 @@ Phép thử để tách hai dạng như sau. Nhóm tìm không gian con mang lo�
 
 **Nhóm cũng hỏi mô hình hình thành cách hiểu vào lúc nào.** Việc đặt bộ phân loại tại từ "believes" đã có trong `note.md` §2 *(phannhatminh đề xuất, note.md)*. Phần so sánh với vị trí cuối là phần thêm vào *(Claude đề xuất, phannhatminh chốt)*. Nếu bộ phân loại tại từ "believes" đã đọc được loại niềm tin, thì mô hình tự hình thành cách hiểu khi đọc câu, trước khi có câu hỏi nào. Nếu loại niềm tin chỉ xuất hiện ở vị trí cuối, sau câu hỏi, thì mô hình chỉ tính cách hiểu khi bị hỏi. Kết quả nào cũng đáng báo cáo.
 
-**Câu hỏi phụ là giả thuyết thứ tư: khi AI hiểu lệch, lỗi nằm ở đâu.** *(huysuy05 đề xuất)* Khả năng thứ nhất là bên trong mô hình không có chỗ nào lưu riêng mức tin chắc của người tin. Khả năng thứ hai là mô hình có lưu thông tin đó nhưng không dùng đến khi trả lời. Thiết kế ba bên cho câu hỏi phụ này một đích đo cụ thể *(Claude đề xuất, phannhatminh chốt)*. Nhóm huấn luyện bộ phân loại để đọc mức tin chắc s mà người nói muốn truyền đạt từ trạng thái bên trong, rồi so con số đọc được với con số m mà mô hình trả lời. Nếu trạng thái bên trong chứa s rõ hơn câu trả lời m, thì lỗi nằm ở bước đọc ra. Nếu trạng thái bên trong không chứa s, thì lỗi nằm ở cách mô hình biểu diễn đoạn văn. Nhánh nghiên cứu trên người không làm được phép đo này, vì không thể nhìn vào trạng thái bên trong của người nghe.
+**Câu hỏi chính thứ hai là giả thuyết thứ tư: khi AI hiểu lệch, lỗi nằm ở đâu?** *(huysuy05 đề xuất)* Khả năng thứ nhất là bên trong mô hình không có chỗ nào lưu riêng mức tin chắc của người tin. Khả năng thứ hai là mô hình có lưu thông tin đó nhưng không dùng đến khi trả lời. Thiết kế ba bên cho câu hỏi này một đích đo cụ thể *(Claude đề xuất, phannhatminh chốt)*. Nhóm huấn luyện bộ phân loại để đọc mức tin chắc s mà người nói muốn truyền đạt từ trạng thái bên trong, rồi so con số đọc được với con số m mà mô hình trả lời. Nếu trạng thái bên trong chứa s rõ hơn câu trả lời m, thì lỗi nằm ở bước đọc ra. Nếu trạng thái bên trong không chứa s, thì lỗi nằm ở cách mô hình biểu diễn đoạn văn. Nhánh nghiên cứu trên người không làm được phép đo này, vì không thể nhìn vào trạng thái bên trong của người nghe.
 
 **Các phương pháp được chạy theo thứ tự từ rẻ đến đắt.** Thứ tự bốn phương pháp, hai mô hình Qwen2.5-7B và Llama-3.1-8B ở độ chính xác đầy đủ, và hạ tầng PyTorch với nnsight hoặc pyvene trên Colab hoặc NDIF là của Huy *(huysuy05 đề xuất)*. Ý dùng bộ phân loại và việc ghép biểu diễn giữa các loại ngữ cảnh đã có trong `note.md` §2 *(phannhatminh đề xuất, note.md)*.
 
@@ -149,7 +151,7 @@ Có năm việc làm được ngay:
 - không làm giảm kết quả trên bộ kiểm tra niềm tin sai BigToM;
 - thu hẹp khoảng cách của AI so với ý người nói trên dữ liệu mà nó chưa từng thấy *(phannhatminh đề xuất)*.
 
-Nếu hai khoảng cách tương đương, phần cơ chế vẫn có giá trị, vì nó cho biết mỗi cách hiểu được biểu diễn bên trong AI như thế nào.
+Nếu hai khoảng cách tương đương, phần cơ chế vẫn có giá trị. Câu hỏi chính thứ nhất vẫn được trả lời đầy đủ, và câu hỏi chính thứ hai vẫn được trả lời trên những tình huống mà AI hiểu lệch.
 
 ## 8. Có ba mốc quyết định có thể làm bài đổi hướng
 

@@ -99,22 +99,57 @@ Kế hoạch dùng hai nghiên cứu đã công bố trên người làm bộ ki
 
 Bộ dữ liệu WishfulEval chỉ còn một vai trò: làm khuôn mẫu cho câu nói về cảm xúc. Đề xuất so sánh với chính niềm tin của mô hình bị bỏ *(Claude đề xuất, phannhatminh chốt)*. Đề xuất đó đo cách mô hình tự ước lượng xác suất, trong khi dự án đo cách mô hình hiểu niềm tin của người khác.
 
-## 7. Phần phân tích cơ chế đi từ những phương pháp rẻ đến những phương pháp đắt
+## 7. Phần phân tích cơ chế hỏi mỗi cách hiểu được biểu diễn bên trong AI như thế nào
 
-Toàn bộ phần phân tích cơ chế và phần sửa mô hình là của Huy *(huysuy05 đề xuất)*. Phần này chạy trên hai mô hình Qwen2.5-7B và Llama-3.1-8B ở độ chính xác đầy đủ. Nó dùng bốn phương pháp theo thứ tự:
+Trong mục này, nhãn *(phannhatminh đề xuất, note.md)* chỉ những ý đã có trong `note.md` từ trước khi có kế hoạch của Huy.
+
+**Câu hỏi chính là: khi AI hiểu chữ "believe", mỗi cách hiểu được biểu diễn bên trong AI như thế nào?** *(phannhatminh đề xuất, note.md)* Câu hỏi này có hai tầng, và cả hai tầng đã được đặt ra ở `note.md` §2. Tầng thứ nhất hỏi các cách hiểu có tách nhau trong trạng thái bên trong của mô hình hay không. Tầng thứ hai hỏi mô hình có thật sự dùng sự phân biệt đó khi suy luận hay không.
+
+**Cụm "khi AI hiểu" được xác định bằng thiết kế ba bên.** *(Claude đề xuất, phannhatminh chốt)* Ở những tình huống mà câu trả lời của AI khớp với ý người nói, nhóm có cơ sở để nói AI hiểu, và việc phân tích biểu diễn ở đó là có nghĩa. Ở những tình huống AI hiểu lệch, việc so biểu diễn giữa hai nhóm tình huống cho biết cái gì bị thiếu. Nhãn cách hiểu dùng để huấn luyện bộ phân loại được lấy từ câu trả lời của người nói, không lấy từ nhãn mà nhóm nghiên cứu gán khi viết đoạn văn.
+
+**Câu trả lời có thể rơi vào hai dạng khác nhau về bản chất, và việc phân biệt hai dạng này tự nó đã là một phát hiện.** *(Claude đề xuất, phannhatminh chốt)*
+
+- Ở dạng thứ nhất, mô hình có một biến trừu tượng cho "loại niềm tin". Nếu dạng này đúng, sẽ tồn tại một hướng hoặc một không gian con nhỏ tách ba cách hiểu, và biến đó tổng quát được sang những lĩnh vực mà bộ phân loại chưa từng thấy.
+- Ở dạng thứ hai, mô hình không có biến như vậy mà chỉ theo dõi từng thành phần riêng lẻ. Các thành phần đó là mức tin chắc, việc niềm tin có đi theo bằng chứng hay không, và việc tin có mang lại lợi ích hay không. Theo dạng này, một cách hiểu chỉ là một tổ hợp của các thành phần.
+
+Phép thử để tách hai dạng như sau. Nhóm tìm không gian con mang loại niềm tin bằng phương pháp DAS, rồi hoán đổi không gian con đó giữa hai đoạn văn. Nếu mô hình có một biến thống nhất, việc hoán đổi sẽ làm mọi câu trả lời đổi cùng lúc, gồm mức tin chắc, khả năng bỏ niềm tin khi có bằng chứng xấu, và tính hợp lý của niềm tin. Nếu mô hình chỉ có các thành phần rời, việc hoán đổi chỉ làm đổi một câu trả lời.
+
+**Nhóm cũng hỏi mô hình hình thành cách hiểu vào lúc nào.** Việc đặt bộ phân loại tại từ "believes" đã có trong `note.md` §2 *(phannhatminh đề xuất, note.md)*. Phần so sánh với vị trí cuối là phần thêm vào *(Claude đề xuất, phannhatminh chốt)*. Nếu bộ phân loại tại từ "believes" đã đọc được loại niềm tin, thì mô hình tự hình thành cách hiểu khi đọc câu, trước khi có câu hỏi nào. Nếu loại niềm tin chỉ xuất hiện ở vị trí cuối, sau câu hỏi, thì mô hình chỉ tính cách hiểu khi bị hỏi. Kết quả nào cũng đáng báo cáo.
+
+**Câu hỏi phụ là giả thuyết thứ tư: khi AI hiểu lệch, lỗi nằm ở đâu.** *(huysuy05 đề xuất)* Khả năng thứ nhất là bên trong mô hình không có chỗ nào lưu riêng mức tin chắc của người tin. Khả năng thứ hai là mô hình có lưu thông tin đó nhưng không dùng đến khi trả lời. Thiết kế ba bên cho câu hỏi phụ này một đích đo cụ thể *(Claude đề xuất, phannhatminh chốt)*. Nhóm huấn luyện bộ phân loại để đọc mức tin chắc s mà người nói muốn truyền đạt từ trạng thái bên trong, rồi so con số đọc được với con số m mà mô hình trả lời. Nếu trạng thái bên trong chứa s rõ hơn câu trả lời m, thì lỗi nằm ở bước đọc ra. Nếu trạng thái bên trong không chứa s, thì lỗi nằm ở cách mô hình biểu diễn đoạn văn. Nhánh nghiên cứu trên người không làm được phép đo này, vì không thể nhìn vào trạng thái bên trong của người nghe.
+
+**Các phương pháp được chạy theo thứ tự từ rẻ đến đắt.** Thứ tự bốn phương pháp, hai mô hình Qwen2.5-7B và Llama-3.1-8B ở độ chính xác đầy đủ, và hạ tầng PyTorch với nnsight hoặc pyvene trên Colab hoặc NDIF là của Huy *(huysuy05 đề xuất)*. Ý dùng bộ phân loại và việc ghép biểu diễn giữa các loại ngữ cảnh đã có trong `note.md` §2 *(phannhatminh đề xuất, note.md)*.
 
 1. Phương pháp thứ nhất theo dõi câu trả lời hình thành dần qua từng tầng của mô hình.
-2. Phương pháp thứ hai lấy trạng thái bên trong từ một đoạn văn và ghép vào đoạn văn kia. Làm vậy cho biết thông tin quyết định câu trả lời nằm ở tầng nào và ở từ nào.
-3. Phương pháp thứ ba huấn luyện các bộ phân loại tuyến tính nhỏ. Mục đích là kiểm tra xem trạng thái bên trong có chứa mức tin chắc được nêu và có chứa việc đoạn văn có câu nói việc tin có ích hay không.
-4. Phương pháp thứ tư tìm một không gian con nhỏ bên trong mô hình mang thông tin về mức tin chắc (phương pháp DAS). Sau đó nó kiểm tra xem thay đổi không gian con đó có làm câu trả lời thay đổi theo không.
+2. Phương pháp thứ hai lấy trạng thái bên trong từ một đoạn văn và ghép vào đoạn văn kia, để tìm tầng và từ mang thông tin quyết định câu trả lời. Có hai cặp đoạn văn được dùng. Cặp thứ nhất gồm phiên bản không có và phiên bản có câu nói việc tin có ích, và việc ghép được làm tại các từ của câu đó, tại từ "believes" và tại từ cuối *(huysuy05 đề xuất)*. Cặp thứ hai gồm phiên bản có và phiên bản không có câu người tin tự nêu mức tin chắc. Cặp này cho biết thông tin mức tin chắc cần được đưa vào đâu để câu trả lời trở nên đúng *(Claude đề xuất, phannhatminh chốt)*.
+3. Phương pháp thứ ba huấn luyện các bộ phân loại tuyến tính nhỏ ở từng tầng. Có bốn đích đọc. Đích thứ nhất là loại niềm tin *(phannhatminh đề xuất, note.md)*. Đích thứ hai là xác suất được nêu trong văn bản, và đích thứ ba là việc đoạn văn có câu nói việc tin có ích hay không *(huysuy05 đề xuất)*. Đích thứ tư là mức tin chắc s mà người nói muốn truyền đạt *(Claude đề xuất, phannhatminh chốt)*.
+4. Phương pháp thứ tư dùng DAS để tìm không gian con nhỏ mang loại niềm tin và mức tin chắc, rồi kiểm tra tác động nhân quả của không gian con đó bằng phép hoán đổi đã mô tả ở trên.
 
-Mục đích của cả bốn bước là trả lời giả thuyết thứ tư. Phần này có thể bắt đầu từ tháng 11 trên các tình huống của pilot, vì nó không cần dữ liệu người.
+**Bộ phân loại phải được bảo vệ khỏi việc học tín hiệu bề mặt.** Hai biện pháp đầu đã có trong `note.md` §2 và §3 *(phannhatminh đề xuất, note.md)*. Biện pháp thứ nhất là so với mô hình túi từ chỉ dùng ngữ cảnh. Biện pháp thứ hai là kiểm tra trên những lĩnh vực mà bộ phân loại chưa gặp. Biện pháp thứ ba là dùng tác vụ kiểm soát theo Hewitt và Liang *(huysuy05 đề xuất)*.
 
-Nếu khoảng cách của AI lớn hơn rõ rệt so với khoảng cách của người nghe là người, bước cuối cùng là sửa mô hình. Cách sửa là huấn luyện một can thiệp nhỏ đặt đúng tại các vị trí bên trong mô hình mà bước trước đã tìm ra (phương pháp ReFT). Cách sửa này sẽ được so với ba cách khác: đẩy trạng thái bên trong theo một hướng cố định, tinh chỉnh một phần nhỏ trọng số, và đơn giản là viết lại câu lệnh. Bất kỳ cách sửa nào cũng phải thỏa ba điều kiện:
+**Quy trình được kiểm tra trên một cơ chế đã biết trước khi tìm cơ chế mới.** Nhóm chạy lại thí nghiệm phân biệt niềm tin với thực tế của Steele và cộng sự trên một mô hình 7B để làm đối chứng dương *(phannhatminh đề xuất, note.md)*. Huy nhắc lại ý này trong kế hoạch của mình.
+
+**Với trạng thái hiện tại, phần cơ chế chỉ làm được việc chuẩn bị và thăm dò.** *(Claude đề xuất, phannhatminh chốt)* Nhận định này khác với kế hoạch của Huy. Kế hoạch của Huy cho rằng nhánh cơ chế có thể bắt đầu cho ra kết quả từ tháng 11 trên các tình huống của pilot. Có ba lý do khiến kết quả trên pilot chưa dùng được cho bài:
+
+- Lý do thứ nhất là pilot chưa có dữ liệu người nói, nên chưa có nhãn cách hiểu từ người nói và chưa có đích s.
+- Lý do thứ hai là yếu tố gây nhiễu mà Huy đã chỉ ra. Ở 21 trong 24 tình huống, câu nói việc tin có ích làm tăng chính khả năng của điều được tin. Vì vậy nếu định vị hiệu ứng trên các tình huống này, nhóm có thể định vị một suy luận hợp lý chứ không phải một cách hiểu.
+- Lý do thứ ba là mọi tình huống pilot đều nêu xác suất khách quan quanh mức một phần mười, nên bộ phân loại không có đủ độ biến thiên để học đọc mức tin chắc.
+
+Có năm việc làm được ngay:
+
+1. Việc thứ nhất là chạy lại pilot trên Qwen2.5-7B ở độ chính xác đầy đủ bằng PyTorch *(huysuy05 đề xuất)*, và kiểm tra rằng kết quả khớp với bản 4-bit *(Claude đề xuất, phannhatminh chốt)*.
+2. Việc thứ hai là chạy phương pháp thứ nhất và phương pháp thứ hai trên pilot *(huysuy05 đề xuất)*, với mục đích kiểm tra công cụ chứ không để báo cáo *(Claude đề xuất, phannhatminh chốt)*.
+3. Việc thứ ba là đặt bộ phân loại tại từ "believes" trên pilot để thăm dò xem ba phiên bản của mỗi tình huống có tách nhau trong biểu diễn không *(Claude đề xuất, phannhatminh chốt)*. Việc này làm được vì ba phiên bản dùng chung câu đích từng chữ. Kết quả chỉ mang tính thăm dò vì hai lý do đầu ở trên.
+4. Việc thứ tư là viết một bộ tình huống nhỏ riêng cho bộ phân loại, trong đó xác suất được nêu thay đổi từ thấp đến cao *(Claude đề xuất, phannhatminh chốt)*.
+5. Việc thứ năm là chạy đối chứng dương theo công trình của Steele và cộng sự *(phannhatminh đề xuất, note.md)*.
+
+**Phần sửa mô hình là phần có điều kiện.** *(huysuy05 đề xuất)* Nếu khoảng cách của AI so với ý người nói lớn hơn rõ rệt so với khoảng cách của người nghe là người, bước cuối cùng là sửa mô hình. Cách sửa là huấn luyện một can thiệp nhỏ đặt đúng tại các vị trí bên trong mô hình mà các bước trước đã tìm ra (phương pháp ReFT). Cách sửa này sẽ được so với ba cách khác: đẩy trạng thái bên trong theo một hướng cố định, tinh chỉnh một phần nhỏ trọng số, và đơn giản là viết lại câu lệnh. Bất kỳ cách sửa nào cũng phải thỏa ba điều kiện:
 
 - giữ nguyên mức tin chắc cao ở những tình huống người tin vì bằng chứng;
 - không làm giảm kết quả trên bộ kiểm tra niềm tin sai BigToM;
 - thu hẹp khoảng cách của AI so với ý người nói trên dữ liệu mà nó chưa từng thấy *(phannhatminh đề xuất)*.
+
+Nếu hai khoảng cách tương đương, phần cơ chế vẫn có giá trị, vì nó cho biết mỗi cách hiểu được biểu diễn bên trong AI như thế nào.
 
 ## 8. Có ba mốc quyết định có thể làm bài đổi hướng
 
